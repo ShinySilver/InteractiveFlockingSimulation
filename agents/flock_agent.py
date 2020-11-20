@@ -8,7 +8,7 @@ class FlockAgent(Agent):
                  alignment_strength: float = 0.5,
                  cohesion_strength: float = 0.3,
                  avoidance_strength: float = 0.2,
-                 pos = (0, 0),
+                 pos=(0, 0),
                  speed: float = 0.5,
                  rotation: float = 0.0,
                  rotation_speed: float = 3.0,
@@ -27,7 +27,7 @@ class FlockAgent(Agent):
         focus @optional is the can-see distance modifier
         nimbus @optional is the can-be-seen distance modifier
         """
-        Agent(self, context, pos, focus, nimbus)
+        super(context, pos, focus, nimbus)
         self.avoidance_distance = avoidance_distance
         self.alignment_strength = alignment_strength
         self.cohesion_strength = cohesion_strength
@@ -37,9 +37,9 @@ class FlockAgent(Agent):
         self.rotation_speed = rotation_speed
 
     def prepare_update(self):
-        avoidance=(0, 0, 0) # x, y, count
-        alignement=(0, 0, 0)
-        cohesion=(0, 0, 0)
+        avoidance = (0, 0, 0)  # x, y, count
+        alignement = (0, 0, 0)
+        cohesion = (0, 0, 0)
         cache = 0.0
         for agent in self.context.agents:
             cache = self.squared_distance_to(agent)
