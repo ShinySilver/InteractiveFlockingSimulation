@@ -4,23 +4,18 @@ from collections.abc import Iterable
 from agents.agent import Agent
 
 class Simulation:
-	def __init__(self, agents=set()):
-		self.agents = agents
-		self.__running = False
+	def __init__(self, agents=[]):
+		self.agents = set(agents)
+
 
 	def __iadd__(self, other):
 		if(isinstance(other, Simulation)):
-			# print(self.agents)
-			# print(other.agents)
 			self.add_agents(other.agents)
-			# print(self.agents)
-			# print(other.agents)
-
-
 		else:
 			if not (isinstance(other, Agent) or isinstance(other, Iterable)):
 				raise TypeError("Not a simulation or Agent(s)")
 			self.add_agents(other)
+		return self
 
 	def add_agents(self, agents):
 		if(isinstance(agents, Agent)):
@@ -45,6 +40,9 @@ class Simulation:
 			agent.apply_update()
 
 	def mainloop(self, period=0):
-		while(self.__running):
+		t0 = time.time()
+		while(True):
 			self.update()
 			time.sleep(0.1)
+			if(period and time.time()-t0>period):
+				break
