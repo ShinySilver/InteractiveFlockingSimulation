@@ -1,6 +1,8 @@
 from agents.agent import Agent
 import numpy as np
 
+from agents.lighthouse_agent import LighthouseAgent
+
 
 class FlockAgent(Agent):
     def __init__(self,
@@ -37,6 +39,8 @@ class FlockAgent(Agent):
         self.rotation = rotation
         self.rotation_speed = rotation_speed
 
+        # TODO: Add modifier balancing / normalization
+
         self.direction = np.array((np.cos(self.rotation),np.sin(self.rotation)))
         self.next_direction = self.direction.copy()
 
@@ -45,7 +49,9 @@ class FlockAgent(Agent):
         alignment = [0, 0, 0]
         cohesion = [0, 0, 0]
         cache1, cache2 = 0.0, 0.0
-        for agent in self.context.get_agents():
+
+        # Flock behaviour handling
+        for agent in self.context.get_agents(FlockAgent):
             if agent is self:
                 continue
             cache1 = self.distance_to(agent)
@@ -53,16 +59,25 @@ class FlockAgent(Agent):
                 cache2 = (agent.pos - self.pos) / cache1
                 cohesion[:2] += cache2
                 cohesion[2] += 1
-                if cache1 <= self.avoidance_distance:
-                    avoidance[:2] += cache2 * -1.0
-                    avoidance[2] += 1
                 if self.can_focus(agent, cache1):
                     alignment[:2] += cache2
                     alignment[2] += 1
+                if cache1 <= self.avoidance_distance:
+                    avoidance[:2] += cache2 * -1.0
+                    avoidance[2] += 1
         if avoidance[2] + alignment[2] + cohesion[2] != 0:
             self.next_direction = [avoidance[i] / avoidance[2] * self.avoidance_strength
                       + alignment[i] / alignment[2] * self.alignment_strength
                       + cohesion[i] / cohesion[2] * self.cohesion_strength for i in [0, 1]]
+
+        # Lighthouse behaviour
+        for agent in self.context.get_agents(LighthouseAgent):
+            # if in nimbus
+            # go toward left/right
+            # if in focus
+            # avoidance
+            pass
+
 
     def apply_update(self):
         if(self.direction[0]*self.next_direction[0]-self.direction[1]*self.next_direction[1]>0):
