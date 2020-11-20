@@ -10,7 +10,7 @@ class Agent:
         nimbus @optional is the can-be-seen distance modifier
         """
         self.context = context
-        self.context.agents+=self
+        self.context+=self
         self.squared_focus = focus ** 2
         self.squared_nimbus = nimbus ** 2
         self.pos = np.array(pos)
