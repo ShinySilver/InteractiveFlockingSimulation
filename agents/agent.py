@@ -5,7 +5,6 @@ import numpy as np
 class Agent(ABC):
     def __init__(self, pos=(0,0,0), focus:float=1.0, nimbus:float=1.0):
         """
-
         Parameters
         ----------
         focus @optional is the can-see distance modifier
@@ -22,9 +21,13 @@ class Agent(ABC):
         return np.sum(self.pos*self.pos-agent._pos*agent._pos)*agent.squared_nimbus<1.0
 
     @abs
-    def render(self):
+    def prepare_update(self):
         raise NotImplementedError()
 
     @abs
-    def update(self):
+    def apply_update(self):
+        raise NotImplementedError()
+
+    @abs
+    def render(self, client):
         raise NotImplementedError()
