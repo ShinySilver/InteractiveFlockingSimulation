@@ -10,7 +10,7 @@ class Simulation:
 
 	def __iadd__(self, other):
 		if(isinstance(other, Simulation)):
-			self.add_agents(other.agents)
+			self.add_agents(other.get_agents())
 		else:
 			if not (isinstance(other, Agent) or isinstance(other, Iterable)):
 				raise TypeError("Not a simulation or Agent(s)")

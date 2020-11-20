@@ -1,4 +1,5 @@
 from agents.agent import Agent
+import numpy as np
 
 
 class FlockAgent(Agent):
@@ -28,39 +29,47 @@ class FlockAgent(Agent):
         nimbus @optional is the can-be-seen distance modifier
         """
         super().__init__(context, pos, focus, nimbus)
-        self.squared_avoidance_distance = avoidance_distance**2
+        self.avoidance_distance = avoidance_distance
         self.alignment_strength = alignment_strength
         self.cohesion_strength = cohesion_strength
         self.avoidance_strength = avoidance_strength
-        self.next_pos = pos
+        self.speed = speed
         self.rotation = rotation
-        self.next_rotation = rotation
         self.rotation_speed = rotation_speed
 
+        self.direction = np.array((np.cos(self.rotation),np.sin(self.rotation)))
+        self.next_direction = self.direction.copy()
+
     def prepare_update(self):
-        avoidance = (0, 0, 0)  # x, y, count
-        alignment = (0, 0, 0)
-        cohesion = (0, 0, 0)
-        cache = 0.0
-        for agent in self.context.agents:
-            cache = self.squared_distance_to(agent)
-            # TODO: add a cached normal vector to target
-            if self.in_nimbus_of(agent, cache):
-                cohesion[:2] += cache
+        avoidance = [0, 0, 0]  # x, y, count
+        alignment = [0, 0, 0]
+        cohesion = [0, 0, 0]
+        cache1, cache2 = 0.0, 0.0
+        for agent in self.context.get_agents():
+            if agent is self:
+                continue
+            cache1 = self.distance_to(agent)
+            if cache1 != 0 and self.in_nimbus_of(agent, cache1):
+                cache2 = (agent.pos - self.pos) / cache1
+                cohesion[:2] += cache2
                 cohesion[2] += 1
-                if cache<=self.squared_avoidance_distance:
-                    avoidance[:2] += cache
+                if cache1 <= self.avoidance_distance:
+                    avoidance[:2] += cache2 * -1.0
                     avoidance[2] += 1
-                if self.can_focus(agent, cache):
-                    alignment[:2] += cache
+                if self.can_focus(agent, cache1):
+                    alignment[:2] += cache2
                     alignment[2] += 1
-
-
-
+        if avoidance[2] + alignment[2] + cohesion[2] != 0:
+            self.next_direction = [avoidance[i] / avoidance[2] * self.avoidance_strength
+                      + alignment[i] / alignment[2] * self.alignment_strength
+                      + cohesion[i] / cohesion[2] * self.cohesion_strength for i in [0, 1]]
 
     def apply_update(self):
-        self.pos = self.next_pos
-        self.rotation = self.next_rotation
+        if(self.direction[0]*self.next_direction[0]-self.direction[1]*self.next_direction[1]>0):
+            self.rotation += self.rotation_speed
+        else:
+            self.rotation -= self.rotation_speed
+        self.pos = np.add(self.pos, (np.cos(self.rotation)*self.speed,np.sin(self.rotation)*self.speed))
 
     def render(self, client):
         pass
