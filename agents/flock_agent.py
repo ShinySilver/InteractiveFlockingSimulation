@@ -27,7 +27,7 @@ class FlockAgent(Agent):
         focus @optional is the can-see distance modifier
         nimbus @optional is the can-be-seen distance modifier
         """
-        super(context, pos, focus, nimbus)
+        super().__init__(context, pos, focus, nimbus)
         self.avoidance_distance = avoidance_distance
         self.alignment_strength = alignment_strength
         self.cohesion_strength = cohesion_strength
