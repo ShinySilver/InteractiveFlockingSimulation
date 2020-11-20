@@ -34,6 +34,7 @@ class FlockAgent(Agent):
         self.avoidance_strength = avoidance_strength
         self.next_pos = pos
         self.rotation = rotation
+        self.next_rotation = rotation
         self.rotation_speed = rotation_speed
 
     def prepare_update(self):

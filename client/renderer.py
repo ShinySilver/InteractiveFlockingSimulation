@@ -1,3 +1,8 @@
+import tkinter as tk
+
 
 class Renderer:
-	pass
+	def __init__(self, context):
+		self.context = context
+
+		
