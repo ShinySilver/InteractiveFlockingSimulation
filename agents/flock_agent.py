@@ -28,7 +28,7 @@ class FlockAgent(Agent):
         nimbus @optional is the can-be-seen distance modifier
         """
         super().__init__(context, pos, focus, nimbus)
-        self.avoidance_distance = avoidance_distance
+        self.squared_avoidance_distance = avoidance_distance**2
         self.alignment_strength = alignment_strength
         self.cohesion_strength = cohesion_strength
         self.avoidance_strength = avoidance_strength
@@ -38,11 +38,24 @@ class FlockAgent(Agent):
 
     def prepare_update(self):
         avoidance = (0, 0, 0)  # x, y, count
-        alignement = (0, 0, 0)
+        alignment = (0, 0, 0)
         cohesion = (0, 0, 0)
         cache = 0.0
         for agent in self.context.agents:
             cache = self.squared_distance_to(agent)
+            # TODO: add a cached normal vector to target
+            if self.in_nimbus_of(agent, cache):
+                cohesion[:2] += cache
+                cohesion[2] += 1
+                if cache<=self.squared_avoidance_distance:
+                    avoidance[:2] += cache
+                    avoidance[2] += 1
+                if self.can_focus(agent, cache):
+                    alignment[:2] += cache
+                    alignment[2] += 1
+
+
+
 
     def apply_update(self):
         self.pos = self.next_pos
