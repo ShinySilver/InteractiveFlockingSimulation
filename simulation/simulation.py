@@ -5,7 +5,7 @@ from agents.agent import Agent
 
 class Simulation:
 	def __init__(self, agents=[]):
-		self.agents = set(agents)
+		self.__agents = set(agents)
 
 
 	def __iadd__(self, other):
@@ -23,7 +23,7 @@ class Simulation:
 		if(isinstance(agents, Iterable)):
 			agents = set(agents)
 		assert isinstance(agents, set)
-		self.agents |= agents
+		self.__agents |= agents
 
 	def del_agents(self, agents):
 		if(isinstance(agents, Agent)):
@@ -31,12 +31,23 @@ class Simulation:
 		if(isinstance(agents, Iterable)):
 			agents = set(agents)
 		assert isinstance(agents, set)
-		self.agents - agents
+		self.__agents - agents
+
+	def get_agents(self, types=Agent):
+		return {a for a in self.__agents if isinstance(a, types)}
+
+	def update_agent_trait(self, types, trait, new_value):
+		agents = self.get_agents(types)
+		# print(f"udpate_sim\n{agents}\n{type}\n{trait}\n{new_value}")
+		for agent in agents:
+			agent.__setattr__(trait, new_value)
+
+
 
 	def update(self):
-		for agent in self.agents:
+		for agent in self.__agents:
 			agent.prepare_update()
-		for agent in self.agents:
+		for agent in self.__agents:
 			agent.apply_update()
 
 	def mainloop(self, period=0):
