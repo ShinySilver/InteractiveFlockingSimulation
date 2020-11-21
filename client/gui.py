@@ -1,14 +1,15 @@
 import tkinter as tk
 from client.agent_trait_scale import AgentTraitScale
 from agents.flock_agent import FlockAgent
+from random import random
 
 class GUI(tk.Tk):
-	def __init__(self, context, width=400):
+	def __init__(self, context):
 		super().__init__()
 
 		# variables
 		self.context = context
-		self.sim_width = width #px
+		self.sim_width = context.width #px
 
 		self.fps = tk.IntVar(self, 2)
 		self.__running = None
@@ -99,15 +100,13 @@ class GUI(tk.Tk):
 		for agent in self.context.get_agents():
 			agent.render(self.field)
 
-	def cp_(self, pos):
-		return (pos[0]%self.width, pos[1]%self.width)
-
 	def setup_sim(self):
 		self.context.del_agents(self.context.get_agents())
 		options = dict([(s.trait, float(s.get())) for s in self.flock_settings])
 		print(options)
 		for i in range(self.fpop.get()):
-			FlockAgent(context=self.context, **options)
+			FlockAgent(context=self.context, pos=(random()*self.sim_width, random()*self.sim_width), **options)
+		self.auto_render()
 
 	def go_stop(self):
 		self.__sim_running = not self.__sim_running

@@ -4,8 +4,9 @@ from collections.abc import Iterable
 from agents.agent import Agent
 
 class Simulation:
-	def __init__(self, agents=[]):
+	def __init__(self, agents=[], width=400):
 		self.__agents = set(agents)
+		self.width = width
 
 	def __iadd__(self, other):
 		if(isinstance(other, Simulation)):
