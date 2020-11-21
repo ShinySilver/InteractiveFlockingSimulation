@@ -12,7 +12,7 @@ class FlockAgent(Agent):
                  cohesion_strength: float = 0.3,
                  avoidance_strength: float = 0.2,
                  pos=(0, 0),
-                 speed: float = 10,
+                 speed: float = 10.0,
                  rotation: float = 0.0,
                  rotation_speed: float = 2.0,
                  focus: float = 50.0,
@@ -59,13 +59,16 @@ class FlockAgent(Agent):
             cache1 = self.distance_to(agent)
             if cache1 != 0 and self.in_nimbus_of(agent, cache1):
                 cache2 = (agent.pos - self.pos) / cache1
-                cohesion[:2] += cache2
+                cohesion[0] = cohesion[0] + cache2[0]
+                cohesion[1] = cohesion[1] + cache2[1]
                 cohesion[2] += 1
                 if self.can_focus(agent, cache1):
-                    alignment[:2] += cache2
+                    alignment[0] = alignment[0] + cache2[0]
+                    alignment[1] = alignment[1] + cache2[1]
                     alignment[2] += 1
                 if cache1 <= self.avoidance_distance:
-                    avoidance[:2] += cache2 * -1.0
+                    avoidance[0] = avoidance[0] + cache2[0] * -1
+                    avoidance[1] = avoidance[1] + cache2[1] * -1
                     avoidance[2] += 1
         if avoidance[2] + alignment[2] + cohesion[2] != 0:
             tmp = (avoidance, alignment, cohesion)
@@ -82,19 +85,28 @@ class FlockAgent(Agent):
             pass
 
     def apply_update(self):
-        if (self.direction[0] * self.next_direction[0] - self.direction[1] * self.next_direction[1] > 0):
+        vector_1 = self.direction.copy()
+        vector_2 = self.next_direction.copy()
+        unit_vector_1 = vector_1 / np.linalg.norm(vector_1)
+        unit_vector_2 = vector_2 / np.linalg.norm(vector_2)
+        dot_product = np.dot(unit_vector_1, unit_vector_2)
+        angle = np.arccos(dot_product)
+
+        if(abs(angle)<self.rotation_speed):
+            self.rotation = angle
+        elif angle>0:
             self.rotation += self.rotation_speed
         else:
             self.rotation -= self.rotation_speed
 
         self.direction = self.next_direction
         delta = (np.cos(self.rotation) * self.speed, np.sin(self.rotation) * self.speed)
-        self.pos = np.add(self.pos, delta)
+        self.pos = self.pos + delta
 
 
     def render(self, client):
         if self.id is None:
-            self.id = client.create_oval(self.pos[0] - 10, self.pos[1] - 10, self.pos[0] + 10, self.pos[1] + 10, fill="red",
+            self.id = client.create_oval(self.pos[0] - 5, self.pos[1] - 5, self.pos[0] + 5, self.pos[1] + 5, fill="blue",
                                outline="white")
             return
-        client.coords(self.id, self.pos[0] - 10, self.pos[1] - 10, self.pos[0] + 10, self.pos[1] + 10)
+        client.coords(self.id, self.pos[0] - 5, self.pos[1] - 5, self.pos[0] + 5, self.pos[1] + 5)
