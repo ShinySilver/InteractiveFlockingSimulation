@@ -12,7 +12,7 @@ class FlockAgent(Agent):
                  cohesion_strength: float = 0.3,
                  avoidance_strength: float = 0.2,
                  pos=(0, 0),
-                 speed: float = 0.5,
+                 speed: float = 10,
                  rotation: float = 0.0,
                  rotation_speed: float = 3.0,
                  focus: float = 1.0,
@@ -41,8 +41,10 @@ class FlockAgent(Agent):
 
         # TODO: Add modifier balancing / normalization
 
-        self.direction = np.array((np.cos(self.rotation),np.sin(self.rotation)))
+        self.direction = np.array((np.cos(self.rotation), np.sin(self.rotation)))
         self.next_direction = self.direction.copy()
+
+        self.id = None
 
     def prepare_update(self):
         avoidance = [0, 0, 0]  # x, y, count
@@ -66,9 +68,10 @@ class FlockAgent(Agent):
                     avoidance[:2] += cache2 * -1.0
                     avoidance[2] += 1
         if avoidance[2] + alignment[2] + cohesion[2] != 0:
-            self.next_direction = [avoidance[i] / avoidance[2] * self.avoidance_strength
-                      + alignment[i] / alignment[2] * self.alignment_strength
-                      + cohesion[i] / cohesion[2] * self.cohesion_strength for i in [0, 1]]
+            tmp = (avoidance, alignment, cohesion)
+            tmp2 = (self.avoidance_strength, self.alignment_strength, self.cohesion_strength)
+            self.next_direction = [np.sum([tmp[j][i] / tmp[j][2] * tmp2[j] for j in range(3) if tmp[j][2] > 0]) for i in
+                                   range(2)]
 
         # Lighthouse behaviour
         for agent in self.context.get_agents(LighthouseAgent):
@@ -78,13 +81,17 @@ class FlockAgent(Agent):
             # avoidance
             pass
 
-
     def apply_update(self):
-        if(self.direction[0]*self.next_direction[0]-self.direction[1]*self.next_direction[1]>0):
+        if (self.direction[0] * self.next_direction[0] - self.direction[1] * self.next_direction[1] > 0):
             self.rotation += self.rotation_speed
         else:
             self.rotation -= self.rotation_speed
-        self.pos = np.add(self.pos, (np.cos(self.rotation)*self.speed,np.sin(self.rotation)*self.speed))
+        self.pos = np.add(self.pos, (np.cos(self.rotation) * self.speed, np.sin(self.rotation) * self.speed))
+
 
     def render(self, client):
-        pass
+        if self.id is None:
+            self.id = client.create_oval(self.pos[0] - 10, self.pos[1] - 10, self.pos[0] + 10, self.pos[1] + 10, fill="red",
+                               outline="white")
+            return
+        client.coords(self.id, self.pos[0] - 10, self.pos[1] - 10, self.pos[0] + 10, self.pos[1] + 10)
