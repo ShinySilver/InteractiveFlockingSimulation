@@ -8,4 +8,4 @@ class AgentTraitScale(tk.Scale):
 		self.context = context
 
 	def update_trait(self, new_value):
-		self.context.update_agent_trait(self.agent_types, self.trait, new_value)
+		self.context.update_agent_trait(self.agent_types, self.trait, float(new_value))
