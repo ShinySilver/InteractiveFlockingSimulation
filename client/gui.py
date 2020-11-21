@@ -34,26 +34,26 @@ class GUI(tk.Tk):
 		# all setting scales
 		self.flock_settings = [
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "nimbus",
-				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1),
+				from_=0, to=200, tickinterval=50, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=10, variable=tk.DoubleVar(self, 100)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "focus",
-				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1),
+				from_=0, to=200, tickinterval=50, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=10, variable=tk.DoubleVar(self, 50)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "avoidance_distance",
-				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1),
+				from_=0, to=200, tickinterval=50, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=10, variable=tk.DoubleVar(self, 30)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "alignment_strength",
-				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1),
+				from_=0, to=1, tickinterval=0.5, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.5)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "cohesion_strength",
-				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1),
+				from_=0, to=1, tickinterval=0.5, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.3)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "avoidance_strength",
-				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1),
+				from_=0, to=1, tickinterval=0.5, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.2)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "rotation_speed",
-				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1)
+				from_=0, to=3, tickinterval=0.5, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 2))
 		]
 		for scale in self.flock_settings:
 			scale.pack()
