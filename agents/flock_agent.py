@@ -7,16 +7,16 @@ from agents.lighthouse_agent import LighthouseAgent
 class FlockAgent(Agent):
     def __init__(self,
                  context,
-                 avoidance_distance: float = 2.0,
+                 avoidance_distance: float = 20.0,
                  alignment_strength: float = 0.5,
                  cohesion_strength: float = 0.3,
                  avoidance_strength: float = 0.2,
                  pos=(0, 0),
                  speed: float = 10,
                  rotation: float = 0.0,
-                 rotation_speed: float = 3.0,
-                 focus: float = 1.0,
-                 nimbus: float = 1.0):
+                 rotation_speed: float = 2.0,
+                 focus: float = 50.0,
+                 nimbus: float = 100.0):
         """
         Parameters
         ----------
@@ -86,7 +86,10 @@ class FlockAgent(Agent):
             self.rotation += self.rotation_speed
         else:
             self.rotation -= self.rotation_speed
-        self.pos = np.add(self.pos, (np.cos(self.rotation) * self.speed, np.sin(self.rotation) * self.speed))
+
+        self.direction = self.next_direction
+        delta = (np.cos(self.rotation) * self.speed, np.sin(self.rotation) * self.speed)
+        self.pos = np.add(self.pos, delta)
 
 
     def render(self, client):
