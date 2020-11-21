@@ -17,7 +17,7 @@ class GUI(tk.Tk):
 
 		self.__sim_running = False
 		self.__id_auto_sim = None
-		self.tps = 100
+		self.tps = 20
 
 		self.fpop = tk.IntVar(self, 100)
 		self.lhpop = tk.IntVar(self, 0)
@@ -63,6 +63,7 @@ class GUI(tk.Tk):
 		 		variable=self.fps, command=self.check_wake_up, label="FPS").pack()
 		self.field = tk.Canvas(field_frame, width=self.sim_width, height=self.sim_width, bg="black")
 		self.field.pack()
+		self.field.bind("<Double-Button-1>", self.add_lighthouse)
 
 		# controls
 		control_frame.pack()
@@ -120,3 +121,6 @@ class GUI(tk.Tk):
 	def auto_sim(self):
 		self.context.update()
 		self.__id_auto_sim = self.after(int(1/self.tps*1000), self.auto_sim)
+
+	def add_lighthouse(self):
+		pass
