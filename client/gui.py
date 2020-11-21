@@ -18,6 +18,9 @@ class GUI(tk.Tk):
 		self.__id_auto_sim = None
 		self.tps = 100
 
+		self.fpop = tk.IntVar(self, 100)
+		self.lhpop = tk.IntVar(self, 0)
+
 		# frames
 		settings_frame = tk.Frame(self, padx=15)
 		settings_frame.grid(row=0, column=0)
@@ -28,12 +31,31 @@ class GUI(tk.Tk):
 		control_frame = tk.Frame(field_frame, pady=7)
 
 		# all setting scales
+		self.flock_settings = [
+		AgentTraitScale(flock_settings_frame, context, FlockAgent, "nimbus",
+				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=0.1),
+		AgentTraitScale(flock_settings_frame, context, FlockAgent, "focus",
+				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=0.1),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "avoidance_distance",
 				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1).pack()
+				length=self.sim_width//2, resolution=0.1),
+		AgentTraitScale(flock_settings_frame, context, FlockAgent, "alignment_strength",
+				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=0.1),
+		AgentTraitScale(flock_settings_frame, context, FlockAgent, "cohesion_strength",
+				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=0.1),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "avoidance_strength",
 				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1).pack()
+				length=self.sim_width//2, resolution=0.1),
+		AgentTraitScale(flock_settings_frame, context, FlockAgent, "rotation_speed",
+				from_=0, to=2, tickinterval=0.5, orient=tk.HORIZONTAL,
+				length=self.sim_width//2, resolution=0.1)
+		]
+		for scale in self.flock_settings:
+			scale.pack()
 
 		# Field
 		tk.Scale(field_frame, from_=0, to=30, length=self.sim_width, orient=tk.HORIZONTAL,
@@ -42,13 +64,16 @@ class GUI(tk.Tk):
 		self.field.pack()
 
 		# controls
-		# TODO : link to simulation
 		control_frame.pack()
 
-		tk.Spinbox(control_frame)
-		tk.Button(control_frame, text="Setup")
+		tk.Scale(control_frame, from_=10, to=300, length=self.sim_width, orient=tk.HORIZONTAL,
+		 		variable=self.fpop, label="FlockAgent population").grid(row=0, column=0, columnspan=2)
+
+		tk.Scale(control_frame, from_=0, to=10, length=self.sim_width, orient=tk.HORIZONTAL,
+		 		variable=self.lhpop, label="lighthouse population").grid(row=1, column=0, columnspan=2)
+		tk.Button(control_frame, text="Setup", command=self.setup_sim).grid(row=2, column=0)
 		self.go_stop_button = tk.Button(control_frame, text="Go", command=self.go_stop)
-		self.go_stop_button.pack(side=tk.RIGHT)
+		self.go_stop_button.grid(row=2, column=1)
 
 	def auto_render(self):
 		self.__running = True
@@ -76,6 +101,13 @@ class GUI(tk.Tk):
 
 	def cp_(self, pos):
 		return (pos[0]%self.width, pos[1]%self.width)
+
+	def setup_sim(self):
+		self.context.del_agents(self.context.get_agents())
+		options = dict([(s.trait, float(s.get())) for s in self.flock_settings])
+		print(options)
+		for i in range(self.fpop.get()):
+			FlockAgent(context=self.context, **options)
 
 	def go_stop(self):
 		self.__sim_running = not self.__sim_running
