@@ -86,7 +86,10 @@ class FlockAgent(Agent):
             self.rotation += self.rotation_speed
         else:
             self.rotation -= self.rotation_speed
-        self.pos = np.add(self.pos, (np.cos(self.rotation) * self.speed, np.sin(self.rotation) * self.speed))
+
+        self.direction = self.next_direction
+        delta = (np.cos(self.rotation) * self.speed, np.sin(self.rotation) * self.speed)
+        self.pos = np.add(self.pos, delta)
 
 
     def render(self, client):
