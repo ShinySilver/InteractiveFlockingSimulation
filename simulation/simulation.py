@@ -7,7 +7,6 @@ class Simulation:
 	def __init__(self, agents=[]):
 		self.__agents = set(agents)
 
-
 	def __iadd__(self, other):
 		if(isinstance(other, Simulation)):
 			self.add_agents(other.get_agents())
