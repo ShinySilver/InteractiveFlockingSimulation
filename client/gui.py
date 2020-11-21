@@ -1,6 +1,9 @@
 import tkinter as tk
 from client.agent_trait_scale import AgentTraitScale
 from agents.flock_agent import FlockAgent
+from agents.lighthouse_agent import LighthouseAgent
+from agents.green_lighthouse import GreenLighthouse
+from agents.red_lighthouse import RedLighthouse
 from random import random
 
 class GUI(tk.Tk):
@@ -63,7 +66,9 @@ class GUI(tk.Tk):
 		 		variable=self.fps, command=self.check_wake_up, label="FPS").pack()
 		self.field = tk.Canvas(field_frame, width=self.sim_width, height=self.sim_width, bg="black")
 		self.field.pack()
-		self.field.bind("<Double-Button-1>", self.add_lighthouse)
+		self.field.bind("<Button-1>", self.add_green_lighthouse)
+		self.field.bind("<Button-2>", self.del_lighthouse)
+		self.field.bind("<Button-3>", self.add_red_lighthouse)
 
 		# controls
 		control_frame.pack()
@@ -71,8 +76,6 @@ class GUI(tk.Tk):
 		tk.Scale(control_frame, from_=10, to=300, length=self.sim_width, orient=tk.HORIZONTAL,
 		 		variable=self.fpop, label="FlockAgent population").grid(row=0, column=0, columnspan=2)
 
-		tk.Scale(control_frame, from_=0, to=10, length=self.sim_width, orient=tk.HORIZONTAL,
-		 		variable=self.lhpop, label="lighthouse population").grid(row=1, column=0, columnspan=2)
 		tk.Button(control_frame, text="Setup", command=self.setup_sim).grid(row=2, column=0)
 		self.go_stop_button = tk.Button(control_frame, text="Go", command=self.go_stop)
 		self.go_stop_button.grid(row=2, column=1)
@@ -122,5 +125,18 @@ class GUI(tk.Tk):
 		self.context.update()
 		self.__id_auto_sim = self.after(int(1/self.tps*1000), self.auto_sim)
 
-	def add_lighthouse(self):
-		pass
+	def __add_lighthouse(self, lhtype, pos):
+		print(lhtype, pos)
+		lhtype(self.context, pos)
+
+	def add_green_lighthouse(self, event):
+		self.__add_lighthouse(GreenLighthouse, (event.x, event.y))
+
+	def add_red_lighthouse(self, event):
+		self.__add_lighthouse(RedLighthouse, (event.x, event.y))
+
+	def del_lighthouse(self, event):
+		lhs = self.context.get_agents(LighthouseAgent)
+		for lh in lhs:
+			pass
+			# TODO: delete agent if cursor in bbox
