@@ -50,25 +50,28 @@ class FlockAgent(Agent):
         avoidance = [0, 0, 0]  # x, y, count
         alignment = [0, 0, 0]
         cohesion = [0, 0, 0]
-        cache1, cache2 = 0.0, 0.0
+        distance, relpos = 0.0, 0.0
 
         # Flock behaviour handling
         for agent in self.context.get_agents(FlockAgent):
             if agent is self:
                 continue
-            cache1 = self.distance_to(agent)
-            if cache1 != 0 and self.in_nimbus_of(agent, cache1):
-                cache2 = (agent.pos - self.pos) / cache1
-                cohesion[0] = cohesion[0] + cache2[0]
-                cohesion[1] = cohesion[1] + cache2[1]
+            distance = self.distance_to(agent)
+            if self.in_nimbus_of(agent, distance):
+                if distance != 0:
+                    relpos = (agent.pos - self.pos) / distance
+                else:
+                    relpos = (0,0)
+                cohesion[0] = cohesion[0] + relpos[0]
+                cohesion[1] = cohesion[1] + relpos[1]
                 cohesion[2] += 1
-                if self.can_focus(agent, cache1):
-                    alignment[0] = alignment[0] + cache2[0]
-                    alignment[1] = alignment[1] + cache2[1]
+                if self.can_focus(agent, distance):
+                    alignment[0] = alignment[0] + relpos[0]
+                    alignment[1] = alignment[1] + relpos[1]
                     alignment[2] += 1
-                if cache1 <= self.avoidance_distance:
-                    avoidance[0] = avoidance[0] + cache2[0] * -1
-                    avoidance[1] = avoidance[1] + cache2[1] * -1
+                if distance <= self.avoidance_distance:
+                    avoidance[0] = avoidance[0] + relpos[0] * -1
+                    avoidance[1] = avoidance[1] + relpos[1] * -1
                     avoidance[2] += 1
         if avoidance[2] + alignment[2] + cohesion[2] != 0:
             tmp = (avoidance, alignment, cohesion)
@@ -87,13 +90,16 @@ class FlockAgent(Agent):
     def apply_update(self):
         vector_1 = self.direction.copy()
         vector_2 = self.next_direction.copy()
+
         unit_vector_1 = vector_1 / np.linalg.norm(vector_1)
         unit_vector_2 = vector_2 / np.linalg.norm(vector_2)
-        dot_product = np.dot(unit_vector_1, unit_vector_2)
-        angle = np.arccos(dot_product)
+
+        angle1 = np.arccos(unit_vector_1[0])
+        angle2 = np.arccos(unit_vector_2[0])
+        angle = (angle2-angle1)
 
         if(abs(angle)<self.rotation_speed):
-            self.rotation = angle
+            self.rotation = angle2
         elif angle>0:
             self.rotation += self.rotation_speed
         else:

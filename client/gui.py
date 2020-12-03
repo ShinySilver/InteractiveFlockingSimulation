@@ -2,6 +2,7 @@ import tkinter as tk
 from client.agent_trait_scale import AgentTraitScale
 from agents.flock_agent import FlockAgent
 from random import random
+import numpy as np
 
 class GUI(tk.Tk):
 	def __init__(self, context):
@@ -106,7 +107,7 @@ class GUI(tk.Tk):
 		options = dict([(s.trait, float(s.get())) for s in self.flock_settings])
 		print(options)
 		for i in range(self.fpop.get()):
-			FlockAgent(context=self.context, pos=(random()*self.sim_width, random()*self.sim_width), **options)
+			FlockAgent(context=self.context, pos=(random()*self.sim_width, random()*self.sim_width), rotation=np.pi * 2.0 * np.random.random(), **options)
 		self.auto_render()
 
 	def go_stop(self):

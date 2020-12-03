@@ -16,20 +16,22 @@ class Agent:
         self.pos = np.array(pos)
 
     def distance_to(self, agent):
-        self.pos %= self.context.width
-        return np.sqrt(np.sum(np.power((agent.pos - self.pos)%self.context.width, (2, 2))))
+        self.pos = self._clamp(self.pos, 0, self.context.width)
+        return np.sqrt(np.sum(np.power(self._shortest(agent.pos - self.pos, 0, self.context.width), 2)))
 
     def can_focus(self, agent, cached_distance=None):
         if cached_distance is not None:
             return cached_distance / self.focus < 1.0
-        self.pos %= self.context.width
-        return np.sqrt(np.sum(np.power((agent.pos - self.pos)%self.context.width, (2, 2)))) / self.focus < 1.0
+        self.pos = self._clamp(self.pos, 0, self.context.width)
+        return np.sqrt(np.sum(np.power(self._shortest(agent.pos - self.pos, 0, self.context.width),
+                                       2))) / self.focus < 1.0
 
     def in_nimbus_of(self, agent, cached_distance=None):
         if cached_distance is not None:
             return cached_distance / agent.nimbus < 1.0
-        self.pos %= self.context.width
-        return np.sqrt(np.sum(np.power((agent.pos - self.pos)%self.context.width, (2, 2)))) / agent.nimbus < 1.0
+        self.pos = self._clamp(self.pos, 0, self.context.width)
+        return np.sqrt(np.sum(np.power(self._shortest(agent.pos - self.pos, 0, self.context.width),
+                                       2))) / agent.nimbus < 1.0
 
     def prepare_update(self):
         raise NotImplementedError()
@@ -39,3 +41,20 @@ class Agent:
 
     def render(self, client):
         raise NotImplementedError()
+
+    def _clamp(self, x, x0, x1):
+        for i in range(len(x)):
+            while x[i]<x0:
+                x[i]+=x1-x0
+            while x[i]>x1:
+                x[i]-=x1-x0
+        return x
+
+    def _shortest(self, x, x0, x1):
+        for i in range(len(x)):
+            if abs(x[i]-(x1-x0)/2.0)<x[i]:
+                x[i] = abs(x[i]-(x1-x0)/2.0)
+            if abs(x[i]+(x1-x0)/2.0)<x[i]:
+                x[i] = abs(x[i]+(x1-x0)/2.0)
+        return x
+
