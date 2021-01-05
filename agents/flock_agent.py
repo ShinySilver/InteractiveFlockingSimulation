@@ -1,8 +1,8 @@
 from agents.agent import Agent
 import numpy as np
 
-from agents.lighthouse_agent import LighthouseAgent
-
+from agents.green_lighthouse import GreenLighthouse
+from agents.red_lighthouse import RedLighthouse
 
 class FlockAgent(Agent):
     def __init__(self,
@@ -69,7 +69,6 @@ class FlockAgent(Agent):
 
                 if distance != 0:
                     relpos = self._shortest(agent.pos - self.pos, 0, self.context.width)/ distance
-                    assert np.abs(np.sqrt(np.sum(np.square(relpos)))-1)<1e-4
                 else:
                     relpos = (0,0)
 
@@ -91,30 +90,62 @@ class FlockAgent(Agent):
                     cohesion[1] = cohesion[1] + relpos[1]*agent_weight
                     cohesion[2] += agent_weight
 
+        if avoidance[2] + alignment[2] + cohesion[2] != 0:
+            tmp = (avoidance, alignment, cohesion)
+            # TODO: fix lighthouse_strength
+            tmp2 = (self.avoidance_strength, self.alignment_strength, self.cohesion_strength)
+            self.direction = [np.sum([tmp[j][i] / tmp[j][2] * tmp2[j] for j in range(3) if tmp[j][2] > 0]) for i in
+                                   range(2)]
+            self.direction = self.direction/np.linalg.norm(self.direction)
+
         # Lighthouse behaviour
-        for agent in self.context.get_agents(LighthouseAgent):
+        target_angles = []
+
+        for agent in self.context.get_agents(GreenLighthouse):
             distance = self.distance_to(agent)
             if self.in_nimbus_of(agent, cached_distance=distance):
                 if distance != 0:
                     relpos = self._shortest(agent.pos - self.pos, 0, self.context.width) / distance
-                    assert np.abs(np.sqrt(np.sum(np.square(relpos)))-1)<1e-4
                 else:
                     relpos = (0,0)
 
-                # Handling lighthouse
-                if self.can_focus(agent, distance):
-                    agent_weight = distance ** 2
-                    lighthouse[0] = lighthouse[0] - relpos[0] * agent_weight
-                    lighthouse[1] = lighthouse[1] - relpos[1] * agent_weight
-                    lighthouse[2] += agent_weight
 
-        if avoidance[2] + alignment[2] + cohesion[2] + lighthouse[2]!= 0:
-            tmp = (avoidance, alignment, cohesion, lighthouse)
-            # TODO: fix lighthouse_strength
-            tmp2 = (self.avoidance_strength, self.alignment_strength, self.cohesion_strength, 1)
-            self.direction = [np.sum([tmp[j][i] / tmp[j][2] * tmp2[j] for j in range(4) if tmp[j][2] > 0]) for i in
-                                   range(2)]
-            self.direction = [v/np.sqrt(np.sum(np.square(self.direction))) for v in self.direction]
+                signed_angle = np.arctan2(*relpos[::-1]) - np.arctan2(*self.direction[::-1])
+                alignment_weight = (np.pi-signed_angle)/np.pi
+                distance_weight = (distance/agent.nimbus)
+                weight = alignment_weight*distance_weight
+                target_angle = np.arctan(self.direction[1] / self.direction[0])
+
+                if(signed_angle>=0):
+                    target_angle -= np.pi/2*weight
+
+                target_angles.append(target_angle)
+
+        for agent in self.context.get_agents(RedLighthouse):
+            distance = self.distance_to(agent)
+            if self.in_nimbus_of(agent, cached_distance=distance):
+                if distance != 0:
+                    relpos = self._shortest(agent.pos - self.pos, 0, self.context.width) / distance
+                else:
+                    relpos = (0,0)
+
+
+                signed_angle = np.arctan2(*relpos[::-1]) - np.arctan2(*self.direction[::-1])
+                alignment_weight = (np.pi-signed_angle)/np.pi
+                distance_weight = (distance/agent.nimbus)
+                weight = alignment_weight*distance_weight
+                target_angle = np.arctan(self.direction[1] / self.direction[0])
+
+                if(signed_angle<=0):
+                    target_angle -= np.pi/2*weight
+
+                target_angles.append(target_angle)
+
+        if(target_angles != []):
+            target_angle = np.mean(target_angles)
+            self.direction = (np.cos(target_angle), np.sin(target_angle))
+
+
 
     def apply_update(self):
         target_angle = np.arctan(self.direction[1]/self.direction[0])

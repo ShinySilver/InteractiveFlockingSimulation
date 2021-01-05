@@ -88,7 +88,7 @@ class GUI(tk.Tk):
 		# controls
 		control_frame.pack()
 
-		tk.Scale(control_frame, from_=10, to=300, length=self.sim_width, orient=tk.HORIZONTAL,
+		tk.Scale(control_frame, from_=1, to=300, length=self.sim_width, orient=tk.HORIZONTAL,
 		 		variable=self.fpop, label="FlockAgent population").grid(row=0, column=0, columnspan=2)
 
 		tk.Button(control_frame, text="Setup", command=self.setup_sim).grid(row=2, column=0)
