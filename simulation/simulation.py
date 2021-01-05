@@ -1,12 +1,19 @@
+import queue
+import sys
+import threading
 import time
 from collections.abc import Iterable
 
 from agents.agent import Agent
 
 class Simulation:
-	def __init__(self, agents=[], width=400):
+	def __init__(self, agents=[], width=400, thread_count=4):
 		self.__agents = set(agents)
 		self.width = width
+		self.threads = []
+		self.queue = queue.Queue(maxsize=300)
+		for i in range(thread_count):
+			self.threads+=[threading.Thread(target=self.__worker, daemon=True).start()]
 
 	def __iadd__(self, other):
 		if(isinstance(other, Simulation)):
@@ -42,11 +49,19 @@ class Simulation:
 		for agent in agents:
 			agent.__setattr__(trait, new_value)
 
+	def __worker(self):
+		while(True):
+			agent = self.queue.get(block=True, timeout=None)
+			agent.prepare_update()
+			self.queue.task_done()
+
 	def update(self):
 		for agent in self.__agents:
-			agent.prepare_update()
+			self.queue.put(agent)
+		self.queue.join()
 		for agent in self.__agents:
 			agent.apply_update()
+			pass
 
 	def mainloop(self, period=0):
 		t0 = time.time()
