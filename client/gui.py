@@ -54,7 +54,7 @@ class GUI(tk.Tk):
 				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.3)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "avoidance_strength",
 				from_=0, to=1, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.2)),
+				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.3)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "rotation_speed",
 				from_=0, to=3, tickinterval=0.5, orient=tk.HORIZONTAL,
 				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.7))

@@ -52,7 +52,7 @@ class FlockAgent(Agent):
         avoidance = [0, 0, 0]  # x, y, count
         alignment = [0, 0, 0]
         cohesion = [0, 0, 0]
-        lighthouse = [0, 0, 0]
+        lighthouse = [0, 0, 1]
         distance, relpos = 0.0, 0.0
 
         # Flock behaviour handling
@@ -95,32 +95,30 @@ class FlockAgent(Agent):
         for agent in self.context.get_agents(LighthouseAgent):
             distance = self.distance_to(agent)
             if self.in_nimbus_of(agent, cached_distance=distance):
-                agent_weight = (self.focus - distance) ** 2
                 if distance != 0:
-                    relpos = self._shortest(agent.pos - self.pos, 0, self.context.width)/ distance
+                    relpos = self._shortest(agent.pos - self.pos, 0, self.context.width) / distance
                     assert np.abs(np.sqrt(np.sum(np.square(relpos)))-1)<1e-4
                 else:
                     relpos = (0,0)
 
                 # Handling lighthouse
                 if self.can_focus(agent, distance):
+                    agent_weight = distance ** 2
                     lighthouse[0] = lighthouse[0] - relpos[0] * agent_weight
                     lighthouse[1] = lighthouse[1] - relpos[1] * agent_weight
-                    lighthouse[2] += agent_weight
+                    #lighthouse[2] += agent_weight
 
         if avoidance[2] + alignment[2] + cohesion[2] + lighthouse[2]!= 0:
             tmp = (avoidance, alignment, cohesion, lighthouse)
             # TODO: fix lighthouse_strength
-            tmp2 = (self.avoidance_strength, self.alignment_strength, self.cohesion_strength, 2)
+            tmp2 = (self.avoidance_strength, self.alignment_strength, self.cohesion_strength, 1)
             self.direction = [np.sum([tmp[j][i] / tmp[j][2] * tmp2[j] for j in range(4) if tmp[j][2] > 0]) for i in
                                    range(2)]
+            self.direction = np.divide(self.direction,np.linalg.norm(self.direction))
 
     def apply_update(self):
-
-        current_rotation = self.rotation # angle
-        target_direction = self.direction # vecteur directeur
         target_angle = np.arctan(self.direction[1]/self.direction[0])
-        relative_oriented_angle = target_angle-current_rotation
+        relative_oriented_angle = target_angle-self.rotation
         if(abs(relative_oriented_angle)<self.rotation_speed):
             self.rotation = target_angle
         elif relative_oriented_angle>0:
