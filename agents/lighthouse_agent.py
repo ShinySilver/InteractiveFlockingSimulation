@@ -24,3 +24,7 @@ class LighthouseAgent(Agent):
         client.coords(self.id[0], self.pos[0] - self.hwidth, self.pos[1] - self.hwidth, self.pos[0] + self.hwidth, self.pos[1] + self.hwidth)
         client.coords(self.id[1],self.pos[0] - self.nimbus, self.pos[1] - self.nimbus, self.pos[0] + self.nimbus,
                                           self.pos[1] + self.nimbus)
+
+    def collide_pos(self, pos):
+        return (pos[0] >= self.pos[0]-self.hwidth and pos[0] <= self.pos[0]+self.hwidth and
+                pos[1] >= self.pos[1]-self.hwidth and pos[1] <= self.pos[1]+self.hwidth)

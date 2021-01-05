@@ -31,7 +31,7 @@ class Simulation:
 		if(isinstance(agents, Iterable)):
 			agents = set(agents)
 		assert isinstance(agents, set)
-		self.__agents - agents
+		self.__agents -= agents
 
 	def get_agents(self, types=Agent):
 		return {a for a in self.__agents if isinstance(a, types)}
