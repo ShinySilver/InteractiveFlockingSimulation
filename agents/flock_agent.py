@@ -82,39 +82,38 @@ class FlockAgent(Agent):
                 if distance <= self.avoidance_distance:
                     # Handling avoidance
                     agent_weight = (self.avoidance_distance - distance) ** 2
-                    avoidance[0] = avoidance[0] + relpos[0] * -1*agent_weight
-                    avoidance[1] = avoidance[1] + relpos[1] * -1*agent_weight
+                    avoidance[0] = avoidance[0] - relpos[0] * agent_weight
+                    avoidance[1] = avoidance[1] - relpos[1] * agent_weight
                     avoidance[2] += agent_weight
                 else:
                     # Handling cohesion
                     cohesion[0] = cohesion[0] + relpos[0]*agent_weight
                     cohesion[1] = cohesion[1] + relpos[1]*agent_weight
                     cohesion[2] += agent_weight
-        if avoidance[2] + alignment[2] + cohesion[2] != 0:
-            tmp = (avoidance, alignment, cohesion)
-            tmp2 = (self.avoidance_strength, self.alignment_strength, self.cohesion_strength)
-            self.direction = [np.sum([tmp[j][i] / tmp[j][2] * tmp2[j] for j in range(3) if tmp[j][2] > 0]) for i in
-                                   range(2)]
 
         # Lighthouse behaviour
         for agent in self.context.get_agents(LighthouseAgent):
-            '''# if in nimbus
             distance = self.distance_to(agent)
             if self.in_nimbus_of(agent, cached_distance=distance):
                 agent_weight = (self.focus - distance) ** 2
-            if distance != 0:
-                relpos = self._shortest(agent.pos - self.pos, 0, self.context.width) / distance
-                assert np.abs(np.sqrt(np.sum(np.square(relpos))) - 1) < 1e-4
-            else:
-                relpos = (0, 0)
+                if distance != 0:
+                    relpos = self._shortest(agent.pos - self.pos, 0, self.context.width)/ distance
+                    assert np.abs(np.sqrt(np.sum(np.square(relpos)))-1)<1e-4
+                else:
+                    relpos = (0,0)
 
-            # Handling alignment
-            if self.can_focus(agent, distance):
-                alignment[0] = alignment[0] + np.cos(agent.rotation) * agent_weight
-                alignment[1] = alignment[1] + np.sin(agent.rotation) * agent_weight
-                alignment[2] += agent_weight
-            '''
-            pass
+                # Handling lighthouse
+                if self.can_focus(agent, distance):
+                    lighthouse[0] = lighthouse[0] - relpos[0] * agent_weight
+                    lighthouse[1] = lighthouse[1] - relpos[1] * agent_weight
+                    lighthouse[2] += agent_weight
+
+        if avoidance[2] + alignment[2] + cohesion[2] + lighthouse[2]!= 0:
+            tmp = (avoidance, alignment, cohesion, lighthouse)
+            # TODO: fix lighthouse_strength
+            tmp2 = (self.avoidance_strength, self.alignment_strength, self.cohesion_strength, 2)
+            self.direction = [np.sum([tmp[j][i] / tmp[j][2] * tmp2[j] for j in range(4) if tmp[j][2] > 0]) for i in
+                                   range(2)]
 
     def apply_update(self):
 

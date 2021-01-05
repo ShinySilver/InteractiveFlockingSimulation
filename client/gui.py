@@ -15,7 +15,7 @@ class GUI(tk.Tk):
 		self.context = context
 		self.sim_width = context.width #px
 
-		self.fps = tk.IntVar(self, 2)
+		self.fps = tk.IntVar(self, 30)
 		self.__running = None
 		self.__id_auto_render = None
 
@@ -23,7 +23,7 @@ class GUI(tk.Tk):
 		self.__id_auto_sim = None
 		self.tps = 20
 
-		self.fpop = tk.IntVar(self, 100)
+		self.fpop = tk.IntVar(self, 40)
 		self.lhpop = tk.IntVar(self, 0)
 
 		# frames
@@ -57,7 +57,7 @@ class GUI(tk.Tk):
 				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.2)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "rotation_speed",
 				from_=0, to=3, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 2))
+				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.7))
 		]
 		for scale in self.flock_settings:
 			scale.pack()
