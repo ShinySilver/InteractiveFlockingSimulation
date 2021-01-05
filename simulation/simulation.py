@@ -42,8 +42,6 @@ class Simulation:
 		for agent in agents:
 			agent.__setattr__(trait, new_value)
 
-
-
 	def update(self):
 		for agent in self.__agents:
 			agent.prepare_update()

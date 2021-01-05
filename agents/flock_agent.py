@@ -52,7 +52,7 @@ class FlockAgent(Agent):
         avoidance = [0, 0, 0]  # x, y, count
         alignment = [0, 0, 0]
         cohesion = [0, 0, 0]
-        lighthouse = [0, 0, 1]
+        lighthouse = [0, 0, 0]
         distance, relpos = 0.0, 0.0
 
         # Flock behaviour handling
@@ -106,7 +106,7 @@ class FlockAgent(Agent):
                     agent_weight = distance ** 2
                     lighthouse[0] = lighthouse[0] - relpos[0] * agent_weight
                     lighthouse[1] = lighthouse[1] - relpos[1] * agent_weight
-                    #lighthouse[2] += agent_weight
+                    lighthouse[2] += agent_weight
 
         if avoidance[2] + alignment[2] + cohesion[2] + lighthouse[2]!= 0:
             tmp = (avoidance, alignment, cohesion, lighthouse)
@@ -114,7 +114,7 @@ class FlockAgent(Agent):
             tmp2 = (self.avoidance_strength, self.alignment_strength, self.cohesion_strength, 1)
             self.direction = [np.sum([tmp[j][i] / tmp[j][2] * tmp2[j] for j in range(4) if tmp[j][2] > 0]) for i in
                                    range(2)]
-            self.direction = np.divide(self.direction,np.linalg.norm(self.direction))
+            self.direction = [v/np.sqrt(np.sum(np.square(self.direction))) for v in self.direction]
 
     def apply_update(self):
         target_angle = np.arctan(self.direction[1]/self.direction[0])
