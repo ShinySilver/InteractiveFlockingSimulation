@@ -1,9 +1,13 @@
 import tkinter as tk
 from client.gui import GUI
 from simulation.simulation import Simulation
-from agents.flock_agent import FlockAgent
+import cProfile
 
 if __name__ == '__main__':
 	sim = Simulation()
 	ui = GUI(sim)
+	pr = cProfile.Profile()
+	pr.enable()
 	ui.mainloop()
+	pr.disable()
+	pr.dump_stats('stats.cprofile')
