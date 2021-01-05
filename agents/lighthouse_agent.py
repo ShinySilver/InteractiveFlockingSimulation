@@ -15,7 +15,11 @@ class LighthouseAgent(Agent):
 
     def render(self, client):
         if self.id is None:
-            self.id = client.create_oval(self.pos[0] - 10, self.pos[1] - 10, self.pos[0] + 10, self.pos[1] + 10, fill=self.color,
-                               outline="yellow")
+            self.id = (client.create_oval(self.pos[0] - 10, self.pos[1] - 10, self.pos[0] + 10, self.pos[1] + 10,
+                                          fill=self.color, outline="yellow"),
+                       client.create_oval(self.pos[0] - self.nimbus, self.pos[1] - self.nimbus, self.pos[0] + self.nimbus,
+                                          self.pos[1] + self.nimbus, outline="yellow"))
             return
-        client.coords(self.id, self.pos[0] - 10, self.pos[1] - 10, self.pos[0] + 10, self.pos[1] + 10)
+        client.coords(self.id[0], self.pos[0] - 10, self.pos[1] - 10, self.pos[0] + 10, self.pos[1] + 10)
+        client.coords(self.id[1],self.pos[0] - self.nimbus, self.pos[1] - self.nimbus, self.pos[0] + self.nimbus,
+                                          self.pos[1] + self.nimbus)

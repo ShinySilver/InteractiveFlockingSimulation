@@ -110,7 +110,7 @@ class GUI(tk.Tk):
 		options = dict([(s.trait, float(s.get())) for s in self.flock_settings])
 		print(options)
 		for i in range(self.fpop.get()):
-			FlockAgent(context=self.context, pos=(random()*self.sim_width, random()*self.sim_width), rotation=np.pi * 2.0 * np.random.random(), **options)
+			FlockAgent(context=self.context, pos=(random()*self.sim_width, random()*self.sim_width), rotation=np.pi * 1.0 * np.random.random(), **options)
 		self.auto_render()
 
 	def go_stop(self):
@@ -128,7 +128,7 @@ class GUI(tk.Tk):
 
 	def __add_lighthouse(self, lhtype, pos):
 		print(lhtype, pos)
-		lhtype(self.context, pos)
+		lhtype(self.context, pos, nimbus=100)
 
 	def add_green_lighthouse(self, event):
 		self.__add_lighthouse(GreenLighthouse, (event.x, event.y))

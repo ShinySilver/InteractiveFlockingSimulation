@@ -50,11 +50,12 @@ class Agent:
                 x[i]-=x1-x0
         return x
 
+#(300, 0), 0, 400
     def _shortest(self, x, x0, x1):
         for i in range(len(x)):
-            if abs(x[i]-(x1-x0)/2.0)<x[i]:
-                x[i] = abs(x[i]-(x1-x0)/2.0)
-            if abs(x[i]+(x1-x0)/2.0)<x[i]:
-                x[i] = abs(x[i]+(x1-x0)/2.0)
+            if abs(x[i]-(x1-x0))<x[i]:
+                x[i] = x[i]-(x1-x0)
+            if abs(x[i]+(x1-x0))<x[i]:
+                x[i] = x[i]+(x1-x0)
         return x
 
