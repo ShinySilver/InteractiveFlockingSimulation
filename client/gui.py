@@ -30,9 +30,11 @@ class GUI(tk.Tk):
 		settings_frame = tk.Frame(self, padx=15)
 		settings_frame.grid(row=0, column=0)
 		flock_settings_frame = tk.LabelFrame(settings_frame, text="flock settings")
-		flock_settings_frame.pack()
+		flock_settings_frame.grid(row=0, column=0)
+		lh_settings_frame = tk.LabelFrame(settings_frame, text="lighthouse settings")
+		lh_settings_frame.grid(row=0, column=1)
 		field_frame = tk.Frame(self, padx=15)
-		field_frame.grid(row=0, column=1)
+		field_frame.grid(row=0, column=2)
 		control_frame = tk.Frame(field_frame, pady=7)
 
 		# all setting scales
@@ -61,6 +63,18 @@ class GUI(tk.Tk):
 		]
 		for scale in self.flock_settings:
 			scale.pack()
+
+		#lighthouse settings
+		self.lh_settings = [
+			AgentTraitScale(lh_settings_frame, context, LighthouseAgent, "nimbus",
+							from_=0, to=200, tickinterval=50, orient=tk.HORIZONTAL,
+							length=self.sim_width // 2, resolution=10, variable=tk.DoubleVar(self, 100))
+
+		]
+		for scale in self.lh_settings:
+			scale.pack()
+
+
 
 		# Field
 		tk.Scale(field_frame, from_=0, to=30, length=self.sim_width, orient=tk.HORIZONTAL,
@@ -107,10 +121,11 @@ class GUI(tk.Tk):
 
 	def setup_sim(self):
 		self.context.del_agents(self.context.get_agents())
+		self.field.delete(tk.ALL)
 		options = dict([(s.trait, float(s.get())) for s in self.flock_settings])
 		print(options)
 		for i in range(self.fpop.get()):
-			FlockAgent(context=self.context, pos=(random()*self.sim_width, random()*self.sim_width), rotation=np.pi * 1.0 * np.random.random(), **options)
+			FlockAgent(context=self.context, pos=(random()*self.sim_width, random()*self.sim_width), rotation=np.pi * 2.0 * np.random.random(), **options)
 		self.auto_render()
 
 	def go_stop(self):
@@ -127,7 +142,6 @@ class GUI(tk.Tk):
 		self.__id_auto_sim = self.after(int(1/self.tps*1000), self.auto_sim)
 
 	def __add_lighthouse(self, lhtype, pos):
-		print(lhtype, pos)
 		lhtype(self.context, pos, nimbus=100)
 
 	def add_green_lighthouse(self, event):
@@ -142,4 +156,3 @@ class GUI(tk.Tk):
 			if lh.collide_pos((event.x, event.y)):
 				self.context.del_agents(lh)
 				self.field.delete(*lh.id)
-				self.field.update()
