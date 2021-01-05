@@ -139,5 +139,7 @@ class GUI(tk.Tk):
 	def del_lighthouse(self, event):
 		lhs = self.context.get_agents(LighthouseAgent)
 		for lh in lhs:
-			pass
-			# TODO: delete agent if cursor in bbox
+			if lh.collide_pos((event.x, event.y)):
+				self.context.del_agents(lh)
+				self.field.delete(*lh.id)
+				self.field.update()
