@@ -16,25 +16,22 @@ class Agent:
         self.pos = np.array(pos)
 
     def distance_to(self, agent):
-        self.pos = self._clamp(self.pos, 0, self.context.width)
         return np.sqrt(np.sum(np.power(self._shortest(agent.pos - self.pos, 0, self.context.width), 2)))
 
     def can_focus(self, agent, cached_distance=None):
         if cached_distance is not None:
             return cached_distance / self.focus < 1.0
-        self.pos = self._clamp(self.pos, 0, self.context.width)
         return np.sqrt(np.sum(np.power(self._shortest(agent.pos - self.pos, 0, self.context.width),
                                        2))) / self.focus < 1.0
 
     def in_nimbus_of(self, agent, cached_distance=None):
         if cached_distance is not None:
             return cached_distance / agent.nimbus < 1.0
-        self.pos = self._clamp(self.pos, 0, self.context.width)
         return np.sqrt(np.sum(np.power(self._shortest(agent.pos - self.pos, 0, self.context.width),
                                        2))) / agent.nimbus < 1.0
 
     def prepare_update(self):
-        raise NotImplementedError()
+        self.pos = self._clamp(self.pos, 0, self.context.width)
 
     def apply_update(self):
         raise NotImplementedError()

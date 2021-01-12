@@ -49,6 +49,8 @@ class FlockAgent(Agent):
         self.is_debug = is_debug
 
     def prepare_update(self):
+        super().prepare_update()
+
         avoidance = [0, 0, 0]  # x, y, count
         alignment = [0, 0, 0]
         cohesion = [0, 0, 0]
@@ -90,9 +92,8 @@ class FlockAgent(Agent):
                     cohesion[1] = cohesion[1] + relpos[1]*agent_weight
                     cohesion[2] += agent_weight
 
-        if avoidance[2] + alignment[2] + cohesion[2] != 0:
+        if abs(avoidance[2] + alignment[2] + cohesion[2]) > 1e-2:
             tmp = (avoidance, alignment, cohesion)
-            # TODO: fix lighthouse_strength
             tmp2 = (self.avoidance_strength, self.alignment_strength, self.cohesion_strength)
             self.direction = [np.sum([tmp[j][i] / tmp[j][2] * tmp2[j] for j in range(3) if tmp[j][2] > 0]) for i in
                                    range(2)]
@@ -111,13 +112,16 @@ class FlockAgent(Agent):
 
 
                 signed_angle = np.arctan2(*relpos[::-1]) - np.arctan2(*self.direction[::-1])
+                signed_angle = signed_angle%(2*np.pi)
+                if signed_angle > np.pi:
+                    signed_angle-=2*np.pi
                 alignment_weight = (np.pi-signed_angle)/np.pi
                 distance_weight = (distance/agent.nimbus)
                 weight = alignment_weight*distance_weight
                 target_angle = np.arctan(self.direction[1] / self.direction[0])
 
-                if(signed_angle>=0):
-                    target_angle -= np.pi/2*weight
+                if(signed_angle>=0 and abs(signed_angle)<np.pi/2):
+                    target_angle += (signed_angle-np.sign(signed_angle)*np.pi/2*(distance-self.nimbus)/self.nimbus)*weight
 
                 target_angles.append(target_angle)
 
@@ -131,13 +135,16 @@ class FlockAgent(Agent):
 
 
                 signed_angle = np.arctan2(*relpos[::-1]) - np.arctan2(*self.direction[::-1])
+                signed_angle = signed_angle%(2*np.pi)
+                if signed_angle > np.pi:
+                    signed_angle-=2*np.pi
                 alignment_weight = (np.pi-signed_angle)/np.pi
                 distance_weight = (distance/agent.nimbus)
                 weight = alignment_weight*distance_weight
                 target_angle = np.arctan(self.direction[1] / self.direction[0])
 
-                if(signed_angle<=0):
-                    target_angle -= np.pi/2*weight
+                if(signed_angle<=0 and abs(signed_angle)<np.pi/2):
+                    target_angle += (signed_angle-np.sign(signed_angle)*np.pi/2*(distance-self.nimbus)/self.nimbus)*weight
 
                 target_angles.append(target_angle)
 
@@ -149,12 +156,17 @@ class FlockAgent(Agent):
 
     def apply_update(self):
         target_angle = np.arctan(self.direction[1]/self.direction[0])
-        relative_oriented_angle = target_angle-self.rotation
+        if self.direction[0]<0:
+            target_angle -=np.pi
+
+        relative_oriented_angle = (target_angle-self.rotation)%(2*np.pi)
+        if relative_oriented_angle>np.pi:
+            relative_oriented_angle-=2*np.pi
         if(abs(relative_oriented_angle)<self.rotation_speed):
             self.rotation = target_angle
         elif relative_oriented_angle>0:
             self.rotation += self.rotation_speed
-        else:
+        elif relative_oriented_angle<0:
             self.rotation -= self.rotation_speed
 
         delta = (np.cos(self.rotation) * self.speed, np.sin(self.rotation) * self.speed)

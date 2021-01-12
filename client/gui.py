@@ -47,7 +47,7 @@ class GUI(tk.Tk):
 				length=self.sim_width//2, resolution=10, variable=tk.DoubleVar(self, 50)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "avoidance_distance",
 				from_=0, to=200, tickinterval=50, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=10, variable=tk.DoubleVar(self, 30)),
+				length=self.sim_width//2, resolution=10, variable=tk.DoubleVar(self, 20)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "alignment_strength",
 				from_=0, to=1, tickinterval=0.5, orient=tk.HORIZONTAL,
 				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.5)),
@@ -56,7 +56,7 @@ class GUI(tk.Tk):
 				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.3)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "avoidance_strength",
 				from_=0, to=1, tickinterval=0.5, orient=tk.HORIZONTAL,
-				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.3)),
+				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.4)),
 		AgentTraitScale(flock_settings_frame, context, FlockAgent, "rotation_speed",
 				from_=0, to=3, tickinterval=0.5, orient=tk.HORIZONTAL,
 				length=self.sim_width//2, resolution=0.1, variable=tk.DoubleVar(self, 0.7))
@@ -68,8 +68,10 @@ class GUI(tk.Tk):
 		self.lh_settings = [
 			AgentTraitScale(lh_settings_frame, context, LighthouseAgent, "nimbus",
 							from_=0, to=200, tickinterval=50, orient=tk.HORIZONTAL,
-							length=self.sim_width // 2, resolution=10, variable=tk.DoubleVar(self, 100))
-
+							length=self.sim_width // 2, resolution=10, variable=tk.DoubleVar(self, 100)),
+			tk.Label(lh_settings_frame, text="\nLClick for Green LightHouse\n"
+											 "RClick for Red LightHouse\n"
+											 "MClick on a LightHouse to remove\n")
 		]
 		for scale in self.lh_settings:
 			scale.pack()
