@@ -8,8 +8,8 @@ from random import random
 import numpy as np
 
 class GUI(tk.Tk):
-	def __init__(self, context):
-		super().__init__()
+	def __init__(self, context, *args, **kwargs):
+		super().__init__(*args, **kwargs)
 
 		# variables
 		self.context = context
