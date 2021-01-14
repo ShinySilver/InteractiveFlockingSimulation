@@ -123,7 +123,7 @@ class FlockAgent(Agent):
                 if(signed_angle>=0 and abs(signed_angle)<np.pi/2):
                     target_angle += (signed_angle-np.sign(signed_angle)*np.pi/2*(distance-self.nimbus)/self.nimbus)*weight
 
-                target_angles.append(target_angle)
+                    target_angles.append(target_angle)
 
         for agent in self.context.get_agents(RedLighthouse):
             distance = self.distance_to(agent)
@@ -146,7 +146,7 @@ class FlockAgent(Agent):
                 if(signed_angle<=0 and abs(signed_angle)<np.pi/2):
                     target_angle += (signed_angle-np.sign(signed_angle)*np.pi/2*(distance-self.nimbus)/self.nimbus)*weight
 
-                target_angles.append(target_angle)
+                    target_angles.append(target_angle)
 
         if(target_angles != []):
             target_angle = np.mean(target_angles)
